@@ -1,0 +1,21 @@
+version: "3.1"
+
+services:
+    database:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        image: database
+        container_name: database
+        ports:
+            - "8000:8080"
+            - "1521:1521"
+        volumes:
+            - ./data/:/u01/app/oracle
+            - ./init/:/docker-entrypoint-initdb.d
+        environment: 
+            - processes=1000
+            - sessions=1105
+            - transactions=1215
+            #- IMPORT_FROM_VOLUME=true
+            #- CHARACTER_SET="BRAZILIAN PORTUGUESE_BRAZIL.WE8ISO8859P1"

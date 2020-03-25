@@ -9,6 +9,11 @@ ADD chkconfig /sbin/chkconfig
 ADD oracle-install.sh /oracle-install.sh
 ADD init.ora /
 ADD initXETemp.ora /
+ADD ./dependencies/oracle-xe_11.2.0-1.0_amd64.debaa /
+ADD ./dependencies/oracle-xe_11.2.0-1.0_amd64.debab /
+ADD ./dependencies/oracle-xe_11.2.0-1.0_amd64.debac /
+ADD ./dependencies/zoneinfo/timezlrg_11.dat /
+ADD ./dependencies/zoneinfo/timezone_11.dat /
 
 # Prepare to install Oracle
 RUN apt-get update && apt-get install -y -q libaio1 net-tools bc curl rlwrap && \

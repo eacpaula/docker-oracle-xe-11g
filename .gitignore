@@ -2,3 +2,8 @@
 *.*~
 *~
 
+#volume locale where database files are storaged
+data/*
+
+#directory where you'll put your dump files
+init/*

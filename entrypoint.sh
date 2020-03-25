@@ -22,16 +22,20 @@ ALTER USER IMPDP ACCOUNT UNLOCK;
 GRANT dba TO IMPDP WITH ADMIN OPTION;
 -- New Scheme User
 create or replace directory IMPDP as '/docker-entrypoint-initdb.d';
-create tablespace $DUMP_NAME datafile '$ORACLE_HOME/$DUMP_NAME.dbf' size 1000M autoextend on next 100M maxsize unlimited;
-create user $DUMP_NAME identified by $DUMP_NAME default tablespace $DUMP_NAME;
-alter user $DUMP_NAME quota unlimited on $DUMP_NAME;
-alter user $DUMP_NAME default role all;
+create tablespace WMS_DATA datafile '$ORACLE_HOME/WMS_DATA.dbf' size 500M autoextend on next 100M maxsize unlimited;
+create tablespace WMS_INDEX datafile '$ORACLE_HOME/WMS_INDEX.dbf' size 50M autoextend on next 50M extent management local;
+create user $DUMP_NAME identified by $DUMP_NAME default tablespace WMS_DATA temporary tablespace TEMP  profile DEFAULT;
 grant connect, resource to $DUMP_NAME;
+grant unlimited tablespace to $DUMP_NAME;
+grant execute on UTL_SMTP to $DUMP_NAME;
+grant select on V_\$SESSION to $DUMP_NAME;
+grant dba to $DUMP_NAME;
 exit;
 EOL
 
 	su oracle -c "NLS_LANG=.$CHARACTER_SET $ORACLE_HOME/bin/sqlplus -S / as sysdba @/tmp/impdp.sql"
-	su oracle -c "NLS_LANG=.$CHARACTER_SET $ORACLE_HOME/bin/impdp IMPDP/IMPDP directory=IMPDP dumpfile=$DUMP_FILE nologfile=y"
+	#su oracle -c "NLS_LANG=.$CHARACTER_SET $ORACLE_HOME/bin/imp IMPDP/IMPDP file=/docker-entrypoint-initdb.d/$DUMP_FILE log=/docker-entrypoint-initdb.d/dump.log full=y"
+	su oracle -c "NLS_LANG=.$CHARACTER_SET $ORACLE_HOME/bin/impdp IMPDP/IMPDP directory=IMPDP dumpfile=$DUMP_FILE logfile=dump.log"
 	#Disable IMPDP user
 	echo -e 'ALTER USER IMPDP ACCOUNT LOCK;\nexit;' | su oracle -c "NLS_LANG=.$CHARACTER_SET $ORACLE_HOME/bin/sqlplus -S / as sysdba"
 }
